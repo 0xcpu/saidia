@@ -1,0 +1,61 @@
+# Dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+.pnpm-debug.log
+
+# Build outputs
+dist/
+build/
+web-ext-artifacts/
+*.zip
+*.xpi
+*.crx
+*.pem
+
+# Development environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# Testing
+coverage/
+.nyc_output/
+
+# Logs
+logs/
+*.log
+
+# Cache
+.eslintcache
+.stylelintcache
+.cache/
+.parcel-cache/
+
+# Temporary files
+tmp/
+temp/
+
+# Extension specific
+# Chrome unpacked extension directory
+chrome-extension/
+# Firefox temporary profiles
+web-ext-artifacts/
+.web-extension-id
+
+# Secrets - never commit these!
+secrets.*.js
+api-keys.js
+**/config/secrets.js

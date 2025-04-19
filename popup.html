@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Saidia - Claude Page Analyzer</title>
+  <style>
+    body {
+      width: 320px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      padding: 16px;
+    }
+    h1 {
+      font-size: 18px;
+      margin: 0 0 12px 0;
+      color: #000;
+    }
+    .status {
+      background: #f8f8f8;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+    .status.safe {
+      background: #e2f7e8;
+      border-left: 4px solid #34c759;
+    }
+    .status.suspicious {
+      background: #fee9e8;
+      border-left: 4px solid #ff3b30;
+    }
+    .status.unknown {
+      background: #f8f8f8;
+      border-left: 4px solid #8e8e93;
+    }
+    button {
+      background: #0071e3;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-right: 8px;
+      font-size: 14px;
+    }
+    button:hover {
+      background: #0062c5;
+    }
+    button.secondary {
+      background: #e2e2e2;
+      color: #333;
+    }
+    button.secondary:hover {
+      background: #d1d1d1;
+    }
+    label {
+      display: block;
+      margin-top: 16px;
+      margin-bottom: 6px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+      margin-bottom: 12px;
+    }
+    .footer {
+      font-size: 12px;
+      color: #8e8e93;
+      margin-top: 16px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Saidia - Claude Page Analyzer</h1>
+    
+    <div id="statusContainer" class="status unknown">
+      <div id="statusText">Current page has not been analyzed yet.</div>
+    </div>
+    
+    <button id="analyzeBtn">Analyze This Page</button>
+    <button id="clearBtn" class="secondary">Clear Results</button>
+    
+    <div id="apiKeySection">
+      <label for="apiKey">Claude API Key:</label>
+      <input type="text" id="apiKey" placeholder="Enter your Claude API key">
+      <button id="saveApiKey">Save Key</button>
+    </div>
+    
+    <div class="footer">
+      Powered by Anthropic's Claude
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html> 
