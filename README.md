@@ -9,6 +9,7 @@ For personal use, no plans to package and publish it in any store.
 - Shows a warning banner for suspicious pages
 - Manual analysis through popup interface
 - API key management for Claude access
+- Ignorelist built based on existing history and bookmarks
 
 ## Setup Instructions
 
@@ -28,7 +29,7 @@ You'll need an API key from Anthropic to use Claude:
 
 ### 3. Configure the Extension
 
-1. Click on the Saidia icon in Safari's toolbar
+1. Click on the Saidia icon
 2. Paste your Claude API key in the designated field
 3. Click "Save Key"
 
@@ -61,8 +62,8 @@ This extension:
 ### Building from Source
 
 1. Clone the repository
-2. Modify files as needed
-3. Load the extension in Safari's Extension Builder
+2. Modify files as needed, use [build.sh](./build.sh) script.
+3. Load the extension from `dist` directory.
 
 ## License
 
