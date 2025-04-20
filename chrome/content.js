@@ -1,6 +1,5 @@
 // Define a unique log prefix constant for this file
-// keep it as var, otherwise Safari complains: `Can't create duplicate variable:`
-var CONTENT_LOG_PREFIX = "[saidia]";
+const CONTENT_LOG_PREFIX = "[saidia]";
 
 /**
  * Helper function for consistent logging with timestamps
@@ -120,7 +119,9 @@ async function shouldIgnoreDomain(url) {
     // Check cached ignore list
     const stored = await chrome.storage.local.get("dynamicIgnoreList");
     if (stored.dynamicIgnoreList) {
-      return stored.dynamicIgnoreList.includes(hostname);
+      const isIgnored = stored.dynamicIgnoreList.includes(hostname);
+      saidiaLog('log', 'Domain ignored:', hostname, isIgnored);
+      return isIgnored;
     }
     
     return false;
@@ -184,10 +185,12 @@ function extractPageData() {
 /**
  * Analyzes the current page
  */
-function analyzeCurrentPage() {
+async function analyzeCurrentPage() {
   const pageData = extractPageData();
 
-  if (shouldIgnoreDomain(pageData.url) === true) {
+  const isIgnored = await shouldIgnoreDomain(pageData.url);
+
+  if (isIgnored) {
     saidiaLog('log', 'Ignoring domain:', pageData.url);
     chrome.runtime.sendMessage({ action: 'ignorePage', pageData });
   } else {
