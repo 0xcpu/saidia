@@ -2,7 +2,8 @@ name: Extension CI
 
 defaults:
   run:
-    working-directory: chrome
+    shell: bash
+    working-directory: ./chrome
 
 on:
   push:
