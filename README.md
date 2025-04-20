@@ -1,6 +1,6 @@
 # Saidia - Page Analyzer
 
-A simple [Chrome](./chrome) browser extensions that analyzes web pages for suspicious content using Anthropic's Claude AI.
+A simple [Chrome](./chrome) browser extension that analyzes web pages for suspicious content using Anthropic's Claude AI.
 For personal use, no plans to package and publish it in any store.
 
 ## Features
