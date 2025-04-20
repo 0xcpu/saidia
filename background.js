@@ -32,6 +32,25 @@ let claudeApiKey = "";
 // Listen for messages from content scripts
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   saidiaLog('log', 'Received message:', message);
+  if (message.action === 'ignorePage') {
+    saidiaLog('log', 'Page ignored:', message.pageData.url);
+    // Cache the result for this URL
+    chrome.storage.local.set({
+      [message.pageData.url]: {
+        analysis: {
+          status: "ignored",
+          explanation: "This page has been ignored as it is found in the ignore list."
+        },
+        timestamp: Date.now()
+      }
+    });
+    sendResponse({
+      status: "ignored",
+      explanation: "This page has been ignored as it is found in the ignore list."
+    });
+    return true;
+  }
+
   if (message.action === 'getHistoryData') {
     // Get browser history data
     try {
@@ -106,19 +125,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         }); 
     });
 
-    if (message.action === 'ignorePage') {
-      // Cache the result for this URL
-      chrome.storage.local.set({
-        [message.pageData.url]: {
-          analysis: {
-            status: "ignored",
-            explanation: "This page has been ignored as it is found in the ignore list."
-          },
-          timestamp: Date.now()
-        }
-      });
-    }
-    
     // Return true to indicate we'll respond asynchronously
     return true;
   }

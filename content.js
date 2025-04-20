@@ -187,7 +187,7 @@ function extractPageData() {
 function analyzeCurrentPage() {
   const pageData = extractPageData();
 
-  if (shouldIgnoreDomain(pageData.url)) {
+  if (shouldIgnoreDomain(pageData.url) === true) {
     saidiaLog('log', 'Ignoring domain:', pageData.url);
     chrome.runtime.sendMessage({ action: 'ignorePage', pageData });
   } else {
