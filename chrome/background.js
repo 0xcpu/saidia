@@ -1,6 +1,5 @@
 // Define log prefix as a constant
-// keep it as var, otherwise Safari complains: `Can't create duplicate variable:`
-var BACKGROUND_LOG_PREFIX = "[saidia]";
+const BACKGROUND_LOG_PREFIX = "[saidia]";
 
 /**
  * Helper function for consistent logging with timestamps

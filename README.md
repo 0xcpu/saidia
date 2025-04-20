@@ -1,6 +1,6 @@
 # Saidia - Page Analyzer
 
-A simple Safari/Chrome browser extension that analyzes web pages for suspicious content using Anthropic's Claude AI.
+A simple [Chrome](./chrome) browser extensions that analyzes web pages for suspicious content using Anthropic's Claude AI.
 For personal use, no plans to package and publish it in any store.
 
 ## Features
@@ -23,9 +23,9 @@ You'll need an API key from Anthropic to use Claude:
 
 ### 2. Install the Extension
 
-#### For Safari on macOS:
+#### Chrome:
 
-1. Follow [this guide](https://developer.apple.com/documentation/safariservices/running-your-safari-web-extension)
+1. [Load unpacked](https://developer.chrome.com/docs/extensions/get-started/tutorial/hello-world#load-unpacked)
 
 ### 3. Configure the Extension
 
@@ -39,7 +39,7 @@ You'll need an API key from Anthropic to use Claude:
 The extension automatically analyzes pages as you browse. If a page is detected as suspicious, a red warning banner will appear at the top of the page.
 
 ### Manual Analysis
-1. Click on the Saidia icon in Safari's toolbar
+1. Click on the Saidia icon in browser's toolbar
 2. Click "Analyze This Page" to manually analyze the current page
 3. View the analysis results in the popup
 
