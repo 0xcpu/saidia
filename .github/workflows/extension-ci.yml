@@ -1,10 +1,5 @@
 name: Extension CI
 
-defaults:
-  run:
-    shell: bash
-    working-directory: ./chrome
-
 on:
   push:
     branches: [ main ]
@@ -14,6 +9,11 @@ on:
 jobs:
   lint-and-format:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./chrome
+
     steps:
       - uses: actions/checkout@v3
       
@@ -34,6 +34,11 @@ jobs:
         
   security-checks:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./chrome
+
     steps:
       - uses: actions/checkout@v3
       
@@ -51,6 +56,11 @@ jobs:
  
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./chrome
+
     needs: [lint-and-format, security-checks]
     steps:
       - uses: actions/checkout@v3
