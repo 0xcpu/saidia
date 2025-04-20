@@ -1,5 +1,5 @@
 // Define log prefix as a constant
-const BACKGROUND_LOG_PREFIX = "[saidia]";
+const BACKGROUND_LOG_PREFIX = '[saidia]';
 
 /**
  * Helper function for consistent logging with timestamps
@@ -10,58 +10,47 @@ const BACKGROUND_LOG_PREFIX = "[saidia]";
 function saidiaLog(level, message, ...args) {
   const timestamp = new Date().toISOString();
   switch (level) {
-    case "error":
-      console.error(
-        `${BACKGROUND_LOG_PREFIX} [${timestamp}] ${message}`,
-        ...args
-      );
+    case 'error':
+      console.error(`${BACKGROUND_LOG_PREFIX} [${timestamp}] ${message}`, ...args);
       break;
-    case "warn":
-      console.warn(
-        `${BACKGROUND_LOG_PREFIX} [${timestamp}] ${message}`,
-        ...args
-      );
+    case 'warn':
+      console.warn(`${BACKGROUND_LOG_PREFIX} [${timestamp}] ${message}`, ...args);
       break;
     default:
-      console.log(
-        `${BACKGROUND_LOG_PREFIX} [${timestamp}] ${message}`,
-        ...args
-      );
+      console.log(`${BACKGROUND_LOG_PREFIX} [${timestamp}] ${message}`, ...args);
   }
 }
 
 // Background service worker for Saidia extension
-saidiaLog("log", "Background script loaded");
+saidiaLog('log', 'Background script loaded');
 
 // Store your Claude API key safely
 // TODO: Move this to a secure storage
-let claudeApiKey = "";
+let claudeApiKey = '';
 
 // Listen for messages from content scripts
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  saidiaLog("log", "Received message:", message);
-  if (message.action === "ignorePage") {
-    saidiaLog("log", "Page ignored:", message.pageData.url);
+  saidiaLog('log', 'Received message:', message);
+  if (message.action === 'ignorePage') {
+    saidiaLog('log', 'Page ignored:', message.pageData.url);
     // Cache the result for this URL
     chrome.storage.local.set({
       [message.pageData.url]: {
         analysis: {
-          status: "ignored",
-          explanation:
-            "This page has been ignored as it is found in the ignore list."
+          status: 'ignored',
+          explanation: 'This page has been ignored as it is found in the ignore list.',
         },
-        timestamp: Date.now()
-      }
+        timestamp: Date.now(),
+      },
     });
     sendResponse({
-      status: "ignored",
-      explanation:
-        "This page has been ignored as it is found in the ignore list."
+      status: 'ignored',
+      explanation: 'This page has been ignored as it is found in the ignore list.',
     });
     return true;
   }
 
-  if (message.action === "getHistoryData") {
+  if (message.action === 'getHistoryData') {
     // Get browser history data
     try {
       const daysToAnalyze = message.daysToAnalyze || 30;
@@ -70,9 +59,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       chrome.history.search(
         {
-          text: "",
+          text: '',
           startTime: oneMonthAgo.getTime(),
-          maxResults: 10000
+          maxResults: 10000,
         },
         historyItems => {
           sendResponse({ historyItems });
@@ -82,13 +71,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       // Return true to indicate we'll respond asynchronously
       return true;
     } catch (error) {
-      saidiaLog("error", "Error accessing browser history:", error);
+      saidiaLog('error', 'Error accessing browser history:', error);
       sendResponse({ error: error.message });
       return true;
     }
   }
 
-  if (message.action === "getBookmarkData") {
+  if (message.action === 'getBookmarkData') {
     // Get bookmark data
     try {
       chrome.bookmarks.getTree(bookmarks => {
@@ -98,22 +87,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       // Return true to indicate we'll respond asynchronously
       return true;
     } catch (error) {
-      saidiaLog("error", "Error accessing bookmarks:", error);
+      saidiaLog('error', 'Error accessing bookmarks:', error);
       sendResponse({ error: error.message });
       return true;
     }
   }
 
-  if (message.action === "analyzePage") {
+  if (message.action === 'analyzePage') {
     // Check if we have an API key
-    chrome.storage.local.get(["claudeApiKey"], result => {
-      claudeApiKey = result.claudeApiKey || "";
+    chrome.storage.local.get(['claudeApiKey'], result => {
+      claudeApiKey = result.claudeApiKey || '';
 
       if (!claudeApiKey) {
         sendResponse({
-          status: "error",
-          explanation:
-            "API key not set. Please set your Claude API key in the extension settings."
+          status: 'error',
+          explanation: 'API key not set. Please set your Claude API key in the extension settings.',
         });
         return;
       }
@@ -126,15 +114,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           chrome.storage.local.set({
             [message.pageData.url]: {
               analysis,
-              timestamp: Date.now()
-            }
+              timestamp: Date.now(),
+            },
           });
         })
         .catch(error => {
-          saidiaLog("error", "Error analyzing page:", error);
+          saidiaLog('error', 'Error analyzing page:', error);
           sendResponse({
-            status: "error",
-            explanation: "Error analyzing page: " + error.message
+            status: 'error',
+            explanation: 'Error analyzing page: ' + error.message,
           });
         });
     });
@@ -167,7 +155,7 @@ Page Content Sample:
 ${pageData.bodyText.substring(0, 3000)}
 
 Sample Links:
-${pageData.links.join("\n")}
+${pageData.links.join('\n')}
 
 Based strictly on this information, is this page suspicious? 
 Please respond with a JSON object with two fields:
@@ -180,24 +168,24 @@ OR
 {"isSuspicious": false, "explanation": "This appears to be a legitimate news article from a known publisher."}
 `;
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        "x-api-key": claudeApiKey,
-        "anthropic-version": "2023-06-01",
-        "anthropic-dangerous-direct-browser-access": "true"
+        'Content-Type': 'application/json',
+        'x-api-key': claudeApiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
       },
       body: JSON.stringify({
-        model: "claude-3-7-sonnet-20250219",
+        model: 'claude-3-7-sonnet-20250219',
         max_tokens: 1024,
         messages: [
           {
-            role: "user",
-            content: prompt
-          }
-        ]
-      })
+            role: 'user',
+            content: prompt,
+          },
+        ],
+      }),
     });
 
     if (!response.ok) {
@@ -217,38 +205,38 @@ OR
       if (jsonMatch) {
         const parsedResponse = JSON.parse(jsonMatch[0]);
         return {
-          status: parsedResponse.isSuspicious ? "suspicious" : "safe",
+          status: parsedResponse.isSuspicious ? 'suspicious' : 'safe',
           isSuspicious: parsedResponse.isSuspicious,
-          explanation: parsedResponse.explanation
+          explanation: parsedResponse.explanation,
         };
       } else {
         // Fallback if Claude didn't return proper JSON
         return {
-          status: "error",
+          status: 'error',
           explanation:
             "Couldn't parse Claude's response properly. Raw response was: " +
             claudeResponse.substring(0, 100) +
-            "..."
+            '...',
         };
       }
     } catch (parseError) {
-      saidiaLog("error", "Error parsing Claude response:", parseError);
+      saidiaLog('error', 'Error parsing Claude response:', parseError);
       return {
-        status: "error",
+        status: 'error',
         explanation:
-          "Error parsing analysis result. Claude may not have returned a valid response."
+          'Error parsing analysis result. Claude may not have returned a valid response.',
       };
     }
   } catch (error) {
-    saidiaLog("error", "Error calling Claude API:", error);
+    saidiaLog('error', 'Error calling Claude API:', error);
     return {
-      status: "error",
-      explanation: "Error connecting to Claude API: " + error.message
+      status: 'error',
+      explanation: 'Error connecting to Claude API: ' + error.message,
     };
   }
 }
 
 // Initialize extension when installed
 chrome.runtime.onInstalled.addListener(() => {
-  saidiaLog("log", "Extension installed");
+  saidiaLog('log', 'Extension installed');
 });
