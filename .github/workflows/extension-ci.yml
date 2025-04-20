@@ -1,5 +1,9 @@
 name: Extension CI
 
+defaults:
+  run:
+    working-directory: chrome
+
 on:
   push:
     branches: [ main ]
@@ -19,13 +23,13 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci chrome/
+        run: npm ci .
           
       - name: Check formatting with Prettier
-        run: npx prettier --check chrome/
+        run: npx prettier --check .
         
       - name: Lint with ESLint
-        run: npx eslint chrome/
+        run: npx eslint .
         
   security-checks:
     runs-on: ubuntu-latest
@@ -39,13 +43,13 @@ jobs:
           cache: 'npm'
           
       - name: Install dependencies
-        run: npm ci chrome/
+        run: npm ci .
       
       - name: Run web-ext lint
-        run: npx web-ext lint chrome/ 
+        run: npx web-ext lint .
         
       - name: Run Mozilla's addon-lint
-        run: npx addons-linter chrome/
+        run: npx addons-linter .
         
   build:
     runs-on: ubuntu-latest
@@ -60,7 +64,7 @@ jobs:
           cache: 'npm'
           
       - name: Install dependencies
-        run: npm ci chrome/
+        run: npm ci .
       
       - name: Build extension
         run: ./chrome/build.sh
