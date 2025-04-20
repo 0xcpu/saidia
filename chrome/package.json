@@ -15,6 +15,7 @@
       "eslint": "^8.38.0",
       "eslint-plugin-no-unsanitized": "^4.0.0",
       "prettier": "^1.19.1",
-      "eslint-plugin-mozilla": "^2.12.5"
+      "eslint-plugin-mozilla": "^2.12.5",
+      "web-ext": "^8.5.0"
     }
 }
