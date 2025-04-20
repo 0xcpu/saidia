@@ -1,12 +1,12 @@
-document.addEventListener("DOMContentLoaded", function() {
-  const analyzeBtn = document.getElementById("analyzeBtn");
-  const clearBtn = document.getElementById("clearBtn");
-  const saveApiKeyBtn = document.getElementById("saveApiKey");
-  const apiKeyInput = document.getElementById("apiKey");
-  const statusContainer = document.getElementById("statusContainer");
-  const statusText = document.getElementById("statusText");
+document.addEventListener('DOMContentLoaded', function() {
+  const analyzeBtn = document.getElementById('analyzeBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const saveApiKeyBtn = document.getElementById('saveApiKey');
+  const apiKeyInput = document.getElementById('apiKey');
+  const statusContainer = document.getElementById('statusContainer');
+  const statusText = document.getElementById('statusText');
 
-  chrome.storage.local.get(["claudeApiKey"], function(result) {
+  chrome.storage.local.get(['claudeApiKey'], function(result) {
     if (result.claudeApiKey) {
       apiKeyInput.value = result.claudeApiKey;
     }
@@ -23,40 +23,37 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   });
 
-  saveApiKeyBtn.addEventListener("click", function() {
+  saveApiKeyBtn.addEventListener('click', function() {
     const apiKey = apiKeyInput.value.trim();
     if (apiKey) {
       chrome.storage.local.set({ claudeApiKey: apiKey }, function() {
-        showTemporaryMessage("API key saved successfully!");
+        showTemporaryMessage('API key saved successfully!');
       });
     } else {
-      showTemporaryMessage("Please enter a valid API key.");
+      showTemporaryMessage('Please enter a valid API key.');
     }
   });
 
-  analyzeBtn.addEventListener("click", function() {
-    chrome.storage.local.get(["claudeApiKey"], function(result) {
+  analyzeBtn.addEventListener('click', function() {
+    chrome.storage.local.get(['claudeApiKey'], function(result) {
       if (!result.claudeApiKey) {
         updateStatusDisplay({
-          status: "error",
-          explanation: "Please set your Claude API key first."
+          status: 'error',
+          explanation: 'Please set your Claude API key first.',
         });
         return;
       }
 
-      statusContainer.className = "status unknown";
-      statusText.textContent = "Analyzing page...";
+      statusContainer.className = 'status unknown';
+      statusText.textContent = 'Analyzing page...';
 
       chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, { action: "manualAnalyze" });
+        chrome.tabs.sendMessage(tabs[0].id, { action: 'manualAnalyze' });
 
         const currentUrl = tabs[0].url;
         const checkInterval = setInterval(function() {
           chrome.storage.local.get([currentUrl], function(result) {
-            if (
-              result[currentUrl] &&
-              result[currentUrl].timestamp > Date.now() - 30000
-            ) {
+            if (result[currentUrl] && result[currentUrl].timestamp > Date.now() - 30000) {
               // Check if result is recent (within 30 seconds)
               clearInterval(checkInterval);
               updateStatusDisplay(result[currentUrl].analysis);
@@ -66,10 +63,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
         setTimeout(function() {
           clearInterval(checkInterval);
-          if (statusText.textContent === "Analyzing page...") {
+          if (statusText.textContent === 'Analyzing page...') {
             updateStatusDisplay({
-              status: "error",
-              explanation: "Analysis timed out. Please try again."
+              status: 'error',
+              explanation: 'Analysis timed out. Please try again.',
             });
           }
         }, 30000);
@@ -78,40 +75,40 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   // Clear results for current page
-  clearBtn.addEventListener("click", function() {
+  clearBtn.addEventListener('click', function() {
     chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
       const currentUrl = tabs[0].url;
       chrome.storage.local.remove([currentUrl], function() {
-        statusContainer.className = "status unknown";
-        statusText.textContent = "Current page has not been analyzed yet.";
+        statusContainer.className = 'status unknown';
+        statusText.textContent = 'Current page has not been analyzed yet.';
       });
     });
   });
 
   function updateStatusDisplay(analysis) {
-    console.log("Updating status display:", analysis);
+    console.log('Updating status display:', analysis);
     if (!analysis) return;
 
     switch (analysis.status) {
-      case "suspicious":
-        statusContainer.className = "status suspicious";
-        statusText.textContent = "⚠️ Warning: " + analysis.explanation;
+      case 'suspicious':
+        statusContainer.className = 'status suspicious';
+        statusText.textContent = '⚠️ Warning: ' + analysis.explanation;
         break;
-      case "safe":
-        statusContainer.className = "status safe";
-        statusText.textContent = "✓ Page appears safe: " + analysis.explanation;
+      case 'safe':
+        statusContainer.className = 'status safe';
+        statusText.textContent = '✓ Page appears safe: ' + analysis.explanation;
         break;
-      case "error":
-        statusContainer.className = "status unknown";
-        statusText.textContent = "⚠️ Analysis failed: " + analysis.explanation;
+      case 'error':
+        statusContainer.className = 'status unknown';
+        statusText.textContent = '⚠️ Analysis failed: ' + analysis.explanation;
         break;
-      case "ignored":
-        statusContainer.className = "status ignored";
-        statusText.textContent = "🚫 Ignore: " + analysis.explanation;
+      case 'ignored':
+        statusContainer.className = 'status ignored';
+        statusText.textContent = '🚫 Ignore: ' + analysis.explanation;
         break;
       default:
-        statusContainer.className = "status unknown";
-        statusText.textContent = "Unknown status: " + analysis.explanation;
+        statusContainer.className = 'status unknown';
+        statusText.textContent = 'Unknown status: ' + analysis.explanation;
     }
   }
 
@@ -119,7 +116,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const originalClassName = statusContainer.className;
     const originalText = statusText.textContent;
 
-    statusContainer.className = "status";
+    statusContainer.className = 'status';
     statusText.textContent = message;
 
     setTimeout(function() {

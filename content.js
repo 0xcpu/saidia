@@ -1,5 +1,5 @@
 // Define a unique log prefix constant for this file
-const CONTENT_LOG_PREFIX = "[saidia]";
+const CONTENT_LOG_PREFIX = '[saidia]';
 
 /**
  * Helper function for consistent logging with timestamps
@@ -10,10 +10,10 @@ const CONTENT_LOG_PREFIX = "[saidia]";
 function saidiaLog(level, message, ...args) {
   const timestamp = new Date().toISOString();
   switch (level) {
-    case "error":
+    case 'error':
       console.error(`${CONTENT_LOG_PREFIX} [${timestamp}] ${message}`, ...args);
       break;
-    case "warn":
+    case 'warn':
       console.warn(`${CONTENT_LOG_PREFIX} [${timestamp}] ${message}`, ...args);
       break;
     default:
@@ -32,7 +32,7 @@ async function createDynamicIgnoreList(options = {}) {
     historyDaysToAnalyze: 30,
     minVisitsForIgnore: 5,
     maxDomainsInList: 500,
-    combinePredefinedDomains: true
+    combinePredefinedDomains: true,
   };
 
   const settings = { ...defaults, ...options };
@@ -41,8 +41,8 @@ async function createDynamicIgnoreList(options = {}) {
   // Request history data from background script instead of direct access
   chrome.runtime.sendMessage(
     {
-      action: "getHistoryData",
-      daysToAnalyze: settings.historyDaysToAnalyze
+      action: 'getHistoryData',
+      daysToAnalyze: settings.historyDaysToAnalyze,
     },
     response => {
       if (response && response.historyItems) {
@@ -52,13 +52,13 @@ async function createDynamicIgnoreList(options = {}) {
             const domain = new URL(item.url).hostname;
             domainFrequency.set(domain, (domainFrequency.get(domain) || 0) + 1);
           } catch (e) {
-            saidiaLog("error", "Error processing URL:", e);
+            saidiaLog('error', 'Error processing URL:', e);
           }
         }
       }
 
       // Also request bookmark data from background script
-      chrome.runtime.sendMessage({ action: "getBookmarkData" }, response => {
+      chrome.runtime.sendMessage({ action: 'getBookmarkData' }, response => {
         if (response && response.bookmarks) {
           // Process bookmarks from response
           function processBookmarks(nodes) {
@@ -67,12 +67,9 @@ async function createDynamicIgnoreList(options = {}) {
                 try {
                   const domain = new URL(node.url).hostname;
                   // Bookmarks get extra weight (equivalent to 3 visits)
-                  domainFrequency.set(
-                    domain,
-                    (domainFrequency.get(domain) || 0) + 3
-                  );
+                  domainFrequency.set(domain, (domainFrequency.get(domain) || 0) + 3);
                 } catch (e) {
-                  saidiaLog("error", "Error processing bookmark URL:", e);
+                  saidiaLog('error', 'Error processing bookmark URL:', e);
                 }
               }
               if (node.children) {
@@ -98,13 +95,13 @@ async function createDynamicIgnoreList(options = {}) {
 
         // Persist the ignore list
         try {
-          saidiaLog("log", "Saving ignore list with length:", ignoreList.size);
+          saidiaLog('log', 'Saving ignore list with length:', ignoreList.size);
           chrome.storage.local.set({
             dynamicIgnoreList: Array.from(ignoreList),
-            ignoreListLastUpdated: new Date().toISOString()
+            ignoreListLastUpdated: new Date().toISOString(),
           });
         } catch (e) {
-          saidiaLog("error", "Error saving dynamic ignore list:", e);
+          saidiaLog('error', 'Error saving dynamic ignore list:', e);
         }
       });
     }
@@ -123,16 +120,16 @@ async function shouldIgnoreDomain(url) {
     const hostname = new URL(url).hostname;
 
     // Check cached ignore list
-    const stored = await chrome.storage.local.get("dynamicIgnoreList");
+    const stored = await chrome.storage.local.get('dynamicIgnoreList');
     if (stored.dynamicIgnoreList) {
       const isIgnored = stored.dynamicIgnoreList.includes(hostname);
-      saidiaLog("log", "Domain ignored:", hostname, isIgnored);
+      saidiaLog('log', 'Domain ignored:', hostname, isIgnored);
       return isIgnored;
     }
 
     return false;
   } catch (e) {
-    saidiaLog("error", "Error checking ignore list:", e);
+    saidiaLog('error', 'Error checking ignore list:', e);
     return false;
   }
 }
@@ -143,16 +140,12 @@ async function shouldIgnoreDomain(url) {
  */
 async function refreshIgnoreList(intervalDays = 7) {
   try {
-    const stored = await chrome.storage.local.get(["ignoreListLastUpdated"]);
-    saidiaLog(
-      "log",
-      "Stored ignore list last updated:",
-      stored.ignoreListLastUpdated
-    );
+    const stored = await chrome.storage.local.get(['ignoreListLastUpdated']);
+    saidiaLog('log', 'Stored ignore list last updated:', stored.ignoreListLastUpdated);
 
     // Create list if it doesn't exist
     if (!stored.ignoreListLastUpdated) {
-      saidiaLog("log", "Creating dynamic ignore list");
+      saidiaLog('log', 'Creating dynamic ignore list');
       createDynamicIgnoreList();
       return;
     }
@@ -162,11 +155,11 @@ async function refreshIgnoreList(intervalDays = 7) {
     const daysElapsed = (new Date() - lastUpdated) / (1000 * 60 * 60 * 24);
 
     if (daysElapsed >= intervalDays) {
-      saidiaLog("log", "Refreshing old ignore list");
+      saidiaLog('log', 'Refreshing old ignore list');
       createDynamicIgnoreList();
     }
   } catch (e) {
-    saidiaLog("error", "Error refreshing ignore list:", e);
+    saidiaLog('error', 'Error refreshing ignore list:', e);
   }
 }
 
@@ -186,12 +179,11 @@ function extractPageData() {
   return {
     url: window.location.href,
     title: document.title,
-    metaDescription:
-      document.querySelector('meta[name="description"]')?.content || "",
+    metaDescription: document.querySelector('meta[name="description"]')?.content || '',
     bodyText: document.body.innerText.substring(0, 5000),
-    links: Array.from(document.querySelectorAll("a"))
+    links: Array.from(document.querySelectorAll('a'))
       .map(a => a.href)
-      .slice(0, 50)
+      .slice(0, 50),
   };
 }
 
@@ -204,26 +196,23 @@ async function analyzeCurrentPage() {
   const isIgnored = await shouldIgnoreDomain(pageData.url);
 
   if (isIgnored) {
-    saidiaLog("log", "Ignoring domain:", pageData.url);
-    chrome.runtime.sendMessage({ action: "ignorePage", pageData });
+    saidiaLog('log', 'Ignoring domain:', pageData.url);
+    chrome.runtime.sendMessage({ action: 'ignorePage', pageData });
   } else {
-    saidiaLog("log", "Analyzing domain:", pageData.url);
-    chrome.runtime.sendMessage(
-      { action: "analyzePage", pageData },
-      response => {
-        if (response) {
-          if (response.status === "suspicious") {
-            showWarningBanner(response.explanation);
-            saidiaLog("log", "Showing warning banner");
-          } else if (response.status === "error") {
-            showErrorBanner(response.explanation);
-            saidiaLog("log", "Showing error banner");
-          } else {
-            saidiaLog("log", "Showing no banner");
-          }
+    saidiaLog('log', 'Analyzing domain:', pageData.url);
+    chrome.runtime.sendMessage({ action: 'analyzePage', pageData }, response => {
+      if (response) {
+        if (response.status === 'suspicious') {
+          showWarningBanner(response.explanation);
+          saidiaLog('log', 'Showing warning banner');
+        } else if (response.status === 'error') {
+          showErrorBanner(response.explanation);
+          saidiaLog('log', 'Showing error banner');
+        } else {
+          saidiaLog('log', 'Showing no banner');
         }
       }
-    );
+    });
   }
 }
 
@@ -232,7 +221,7 @@ async function analyzeCurrentPage() {
  * @param {string} explanation The explanation for the warning
  */
 function showWarningBanner(explanation) {
-  const banner = document.createElement("div");
+  const banner = document.createElement('div');
   banner.style.cssText = `
     position: fixed;
     top: 0;
@@ -247,19 +236,17 @@ function showWarningBanner(explanation) {
     box-shadow: 0 2px 10px rgba(0,0,0,0.2);
   `;
 
-  const message = document.createElement("p");
-  message.textContent =
-    "⚠️ Warning: This page has been flagged as potentially suspicious.";
+  const message = document.createElement('p');
+  message.textContent = '⚠️ Warning: This page has been flagged as potentially suspicious.';
   banner.appendChild(message);
 
-  const details = document.createElement("p");
-  details.style.fontSize = "14px";
-  details.textContent =
-    explanation || "The content on this page may be misleading or harmful.";
+  const details = document.createElement('p');
+  details.style.fontSize = '14px';
+  details.textContent = explanation || 'The content on this page may be misleading or harmful.';
   banner.appendChild(details);
 
-  const closeBtn = document.createElement("button");
-  closeBtn.textContent = "Dismiss";
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = 'Dismiss';
   closeBtn.style.cssText = `
     background: white;
     color: #ff3b30;
@@ -278,7 +265,7 @@ function showWarningBanner(explanation) {
 
 // Shows error banner when analysis fails
 function showErrorBanner(explanation) {
-  const banner = document.createElement("div");
+  const banner = document.createElement('div');
   banner.style.cssText = `
     position: fixed;
     top: 0;
@@ -293,18 +280,17 @@ function showErrorBanner(explanation) {
     box-shadow: 0 2px 10px rgba(0,0,0,0.2);
   `;
 
-  const message = document.createElement("p");
-  message.textContent = "⚠️ Notice: Failed to analyze this page.";
+  const message = document.createElement('p');
+  message.textContent = '⚠️ Notice: Failed to analyze this page.';
   banner.appendChild(message);
 
-  const details = document.createElement("p");
-  details.style.fontSize = "14px";
-  details.textContent =
-    explanation || "Could not determine if this page is safe or suspicious.";
+  const details = document.createElement('p');
+  details.style.fontSize = '14px';
+  details.textContent = explanation || 'Could not determine if this page is safe or suspicious.';
   banner.appendChild(details);
 
-  const closeBtn = document.createElement("button");
-  closeBtn.textContent = "Dismiss";
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = 'Dismiss';
   closeBtn.style.cssText = `
     background: white;
     color: #ff9500;
@@ -325,7 +311,7 @@ function showErrorBanner(explanation) {
  * Shows an ignore banner
  */
 function showIgnoreBanner() {
-  const banner = document.createElement("div");
+  const banner = document.createElement('div');
   banner.style.cssText = `
     position: fixed;
     top: 0;
@@ -340,14 +326,14 @@ function showIgnoreBanner() {
     box-shadow: 0 2px 10px rgba(0,0,0,0.2);
   `;
 
-  const message = document.createElement("p");
-  message.textContent = "🚫 Ignore: This page has been ignored.";
+  const message = document.createElement('p');
+  message.textContent = '🚫 Ignore: This page has been ignored.';
   banner.appendChild(message);
 
   document.body.appendChild(banner);
 
-  const closeBtn = document.createElement("button");
-  closeBtn.textContent = "Dismiss";
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = 'Dismiss';
   closeBtn.style.cssText = `
     background: white;
     color: #0071e3;
@@ -365,19 +351,19 @@ function showIgnoreBanner() {
 }
 
 // Content script that runs on every page
-saidiaLog("log", "Content script loaded");
+saidiaLog('log', 'Content script loaded');
 initializeIgnoreList();
-saidiaLog("log", "Ignore list initialized");
+saidiaLog('log', 'Ignore list initialized');
 
 // Run analysis when page is fully loaded
-window.addEventListener("load", () => {
+window.addEventListener('load', () => {
   // Wait a moment for dynamic content to load
   setTimeout(analyzeCurrentPage, 1500);
 });
 
 // Listen for messages from popup or background script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "manualAnalyze") {
+  if (message.action === 'manualAnalyze') {
     analyzeCurrentPage();
   }
   return true;
